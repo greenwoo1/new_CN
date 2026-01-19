@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: cn_db
+    restart: always
+    environment:
+      POSTGRES_USER: cn_admin
+      POSTGRES_PASSWORD: super_secret_password
+      POSTGRES_DB: controlnode_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cn_net
+
+  backend:
+    build: ./backend
+    container_name: cn_back
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://cn_admin:super_secret_password@db:5432/controlnode_db
+    depends_on:
+      - db
+    networks:
+      - cn_net
+
+  frontend:
+    build: ./frontend
+    container_name: cn_front
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - cn_net
+
+networks:
+  cn_net:
+    driver: bridge
+
+volumes:
+  postgres_data:

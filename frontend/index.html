@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8"><title>ControlNode | CN</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <section id="login-page" class="page active">
+            <canvas id="neural-canvas"></canvas>
+            <div class="login-box">
+                <h1>ControlNode</h1>
+                <form id="auth-form">
+                    <input type="text" id="user_login" placeholder="Username" required>
+                    <input type="password" id="user_pass" placeholder="Password" required>
+                    <button type="submit">LOGIN</button>
+                </form>
+            </div>
+        </section>
+        <section id="main-interface" class="page">
+            <nav class="sidebar">
+                <div class="sidebar-header">CN</div>
+                <ul class="nav-links">
+                    <li data-page="servers" class="active"><i class="fas fa-server"></i> <span>Servers</span></li>
+                    <li data-page="domains"><i class="fas fa-globe"></i> <span>Domains</span></li>
+                    <li data-page="users"><i class="fas fa-users"></i> <span>Users</span></li>
+                    <li data-page="settings"><i class="fas fa-cog"></i> <span>Settings</span></li>
+                </ul>
+                <div class="logout" onclick="app.logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            </nav>
+            <main class="main-content">
+                <header class="top-bar">
+                    <h2 id="page-title">Servers</h2>
+                    <div class="top-actions">
+                        <div class="search-box"><input type="text" id="main-search" placeholder="Search..."></div>
+                        <button class="btn-add">+ Add New</button>
+                    </div>
+                </header>
+                <div id="content-render" class="table-container"></div>
+            </main>
+        </section>
+    </div>
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 id="modal-title">Action</h3>
+                <span class="close-modal" onclick="app.closeModal()">&times;</span>
+            </div>
+            <div id="modal-content" class="modal-body"></div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
