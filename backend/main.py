@@ -197,6 +197,15 @@ async def update_domain(id: int, domain_data: schemas.DomainCreate, db: Session 
 async def get_projects(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     return db.query(models.Project).all()
 
+@app.post("/api/projects", response_model=schemas.Project)
+async def add_project(project: schemas.ProjectCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(RoleChecker(["Super Admin", "Admin 2L", "Service Manager"]))):
+    proj = models.Project(**project.dict())
+    db.add(proj)
+    db.commit()
+    db.refresh(proj)
+    add_log(db, proj.id, "project", "Created", f"Title: {proj.title}", current_user.username)
+    return proj
+
 @app.get("/api/groups", response_model=List[schemas.Group])
 async def get_groups(q: Optional[str] = None, db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
     query = db.query(models.Group)
