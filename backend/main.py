@@ -59,6 +59,7 @@ class RoleChecker:
     def __call__(self, user: models.User = Depends(get_current_user)):
         if user.role not in self.allowed_roles:
             raise HTTPException(status_code=403, detail="Operation not permitted")
+        return user
 
 # --- App Initialization ---
 app = FastAPI()
@@ -234,8 +235,6 @@ async def update_group(id: int, group_data: schemas.GroupCreate, db: Session = D
 
 @app.get("/api/finance", response_model=List[schemas.Finance])
 async def get_finance_records(q: Optional[str] = None, db: Session = Depends(database.get_db), current_user: models.User = Depends(RoleChecker(["Super Admin", "Admin 2L"]))):
-    if current_user.role == "Service Manager":
-        raise HTTPException(status_code=403, detail="Operation not permitted")
     query = db.query(models.Finance)
     if q:
         query = query.join(models.Server).join(models.Group).filter(
@@ -286,8 +285,15 @@ async def get_users(q: Optional[str] = None, db: Session = Depends(database.get_
 
 @app.post("/api/users", response_model=schemas.User)
 async def add_user(user: schemas.UserCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(RoleChecker(["Super Admin", "Admin 2L"]))):
-    user.hashed_password = get_password_hash(user.password)
-    new_user = models.User(**user.dict())
+    hashed_password = get_password_hash(user.password)
+    new_user = models.User(
+        username=user.username,
+        email=user.email,
+        hashed_password=hashed_password,
+        role=user.role,
+        status=user.status,
+        number=user.number
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
